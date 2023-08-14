@@ -120,7 +120,7 @@ func (p *Provider) keepContainer(ctx context.Context, item itemData) bool {
 		return false
 	}
 
-	if item.Status != api.HealthPassing && item.Status != api.HealthWarning {
+	if item.Status != api.HealthPassing {
 		logger.Debug("Filtering unhealthy or starting item")
 		return false
 	}
