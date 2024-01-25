@@ -3222,11 +3222,20 @@ func TestFilterHealthStatuses(t *testing.T) {
 				{
 					ID:      "id",
 					Node:    "Node1",
-					Name:    "Test",
+					Name:    "Test1",
 					Address: "127.0.0.1",
 					Port:    "80",
 					Labels:  nil,
 					Status:  api.HealthPassing,
+				},
+				{
+					ID:      "id",
+					Node:    "Node2",
+					Name:    "Test2",
+					Address: "127.0.0.1",
+					Port:    "81",
+					Labels:  nil,
+					Status:  api.HealthWarning,
 				},
 			},
 			defaultRule: "Host(`foo.bar`)",
@@ -3243,19 +3252,37 @@ func TestFilterHealthStatuses(t *testing.T) {
 				},
 				HTTP: &dynamic.HTTPConfiguration{
 					Routers: map[string]*dynamic.Router{
-						"Test": {
-							Service:     "Test",
+						"Test1": {
+							Service:     "Test1",
+							Rule:        "Host(`foo.bar`)",
+							DefaultRule: true,
+						},
+						"Test2": {
+							Service:     "Test2",
 							Rule:        "Host(`foo.bar`)",
 							DefaultRule: true,
 						},
 					},
 					Middlewares: map[string]*dynamic.Middleware{},
 					Services: map[string]*dynamic.Service{
-						"Test": {
+						"Test1": {
 							LoadBalancer: &dynamic.ServersLoadBalancer{
 								Servers: []dynamic.Server{
 									{
 										URL: "http://127.0.0.1:80",
+									},
+								},
+								PassHostHeader: Bool(true),
+								ResponseForwarding: &dynamic.ResponseForwarding{
+									FlushInterval: ptypes.Duration(100 * time.Millisecond),
+								},
+							},
+						},
+						"Test2": {
+							LoadBalancer: &dynamic.ServersLoadBalancer{
+								Servers: []dynamic.Server{
+									{
+										URL: "http://127.0.0.1:81",
 									},
 								},
 								PassHostHeader: Bool(true),
@@ -3280,7 +3307,7 @@ func TestFilterHealthStatuses(t *testing.T) {
 					Address: "127.0.0.1",
 					Port:    "80",
 					Labels:  nil,
-					Status:  api.HealthWarning,
+					Status:  api.HealthCritical,
 				},
 			},
 			defaultRule: "Host(`foo.bar`)",

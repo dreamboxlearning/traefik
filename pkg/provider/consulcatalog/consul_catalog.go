@@ -141,7 +141,7 @@ func (p *Provider) Init() error {
 
 	// Set the default health check to keep container to "passing"
 	if len(p.StrictChecks) == 0 {
-		p.StrictChecks = []string{api.HealthPassing}
+		p.StrictChecks = []string{api.HealthPassing, api.HealthWarning}
 	}
 
 	p.defaultRuleTpl = defaultRuleTpl
